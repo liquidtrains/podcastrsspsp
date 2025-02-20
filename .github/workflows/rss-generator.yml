@@ -1,0 +1,36 @@
+name: Run RSS Generator Every Second Day
+
+on:
+  schedule:
+    # Runs every day at midnight UTC (adjust time as needed)
+    - cron: '0 0 * * *'
+
+jobs:
+  generate-rss:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python (assuming Python 3.x)
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install dependencies (BeautifulSoup, feedgen, etc.)
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4 feedgen python-dateutil
+
+      # Run the script only on odd-numbered days (e.g., 1st, 3rd, 5th, etc.)
+      - name: Run script every second day
+        run: |
+          DAY=$(date +%d)
+          if [ $((DAY % 2)) -eq 1 ]; then
+            echo "Running script on day $DAY (odd day)"
+            python soundgasmChapo_rss_generator.py
+          else
+            echo "Skipping script on day $DAY (even day)"
+          fi
